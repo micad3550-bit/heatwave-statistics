@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How much did climate change matter to this heat wave?</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2713%27 fill=%27%23eb6834%27/%3E%3C/svg%3E">
+<meta name="description" content="An interactive explainer for reporters: how extreme event attribution turns a record heat wave into a defensible sentence about relative risk.">
+<style>
+:root{
+  --page:#ffffff; --panel:#f2f4f7; --ink:#14181f; --ink2:#434b57; --ink3:#5b6370;
+  --line:#d5dae1; --grid:#e6e9ee; --then:#2a78d6; --now:#eb6834;
+  --flag-bg:#fff3d1; --flag-ink:#4d3900; --flag-line:#d9a521;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Charter,"Book Antiqua",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --page:#14161a; --panel:#1d2026; --ink:#eceef2; --ink2:#c4c9d1; --ink3:#9ca3af;
+    --line:#383d46; --grid:#2a2e35; --then:#3987e5; --now:#d95926;
+    --flag-bg:#33290e; --flag-ink:#f0d98c; --flag-line:#8a6d1c;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.6}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--then);outline-offset:2px}
+h1,h2,h3{font-family:var(--serif);line-height:1.15;margin:0;font-weight:700;letter-spacing:-0.01em}
+h1{font-size:clamp(2.1rem,5.2vw,3.4rem);letter-spacing:-0.02em;max-width:19ch}
+h2{font-size:clamp(1.5rem,3vw,1.9rem);margin-bottom:.6em}
+h3{font-size:1.05rem;font-family:var(--sans);font-weight:650;letter-spacing:0}
+p{margin:0 0 1em}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.prose{max-width:68ch}
+section{padding:56px 0 0}
+.mast{padding:56px 0 8px}
+.mast .wrap{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:56px;align-items:end}
+.mast .deck{font-size:1.25rem;max-width:60ch;color:var(--ink2);margin:20px 0 0}
+.who{font-family:var(--sans);font-size:.95rem;color:var(--ink2);max-width:70ch;border-left:3px solid var(--ink);padding-left:16px;margin-bottom:6px}
+.who p{margin:0 0 .5em}
+.who p:last-child{margin:0}
+
+/* three ideas */
+.ideas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:28px 36px;margin:28px 0 0;padding:0;font-family:var(--sans)}
+.ideas div{border-top:2px solid var(--ink);padding-top:12px}
+.ideas dt{font-weight:650;margin-bottom:4px}
+.ideas dd{margin:0;font-size:.95rem;color:var(--ink2);line-height:1.5}
+.ideas .eq{display:block;margin-top:8px;font-size:.9rem;color:var(--ink)}
+
+/* explorer */
+.explorer{display:grid;grid-template-columns:minmax(290px,350px) minmax(0,1fr);gap:48px;align-items:start;margin-top:8px}
+.controls{position:sticky;top:16px;font-family:var(--sans);background:var(--panel);padding:20px 20px 22px;border-radius:6px}
+.controls h2{font-family:var(--sans);font-size:1.05rem;margin:0 0 4px}
+.controls .lead{font-size:.88rem;color:var(--ink2);margin:0 0 14px;line-height:1.45}
+.grp{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.grp:first-of-type{border-top:0;padding-top:0;margin-top:10px}
+.grp>h3{font-size:.95rem;color:var(--ink3);font-weight:600;margin-bottom:8px}
+.ctl{margin-bottom:16px}
+.ctl:last-child{margin-bottom:0}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-weight:600;font-size:.95rem;line-height:1.3}
+.ctl output{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.ctl input[type=range]{width:100%;margin:8px 0 2px;accent-color:var(--ink);height:28px;cursor:pointer}
+.controls .help,.ctl .help{font-size:.82rem;color:var(--ink2);line-height:1.42;margin:0}
+.ctl .derived{font-size:.82rem;color:var(--ink);margin:4px 0 0;font-variant-numeric:tabular-nums}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.presets button,.reset{font:inherit;font-size:.85rem;font-weight:600;padding:7px 11px;border:1px solid var(--ink3);background:var(--page);color:var(--ink);border-radius:4px;cursor:pointer;line-height:1.2}
+.presets button:hover,.reset:hover{background:var(--ink);color:var(--page)}
+.presets button[aria-pressed=true]{background:var(--ink);color:var(--page)}
+.reset{border-color:transparent!important;background:transparent!important;color:var(--ink)!important;text-decoration:underline;padding-left:2px;margin-top:8px}
+
+.results{min-width:0;font-family:var(--sans)}
+.bar{display:none}
+
+/* the sentence */
+.wire{font-family:var(--serif);font-size:clamp(1.45rem,2.6vw,2rem);line-height:1.28;font-weight:600;margin:0 0 .6em;letter-spacing:-.005em}
+.wire b{font-weight:800;background:linear-gradient(transparent 62%,color-mix(in srgb,var(--now) 32%,transparent) 62%)}
+.ctxt{font-size:1rem;color:var(--ink2);margin:0 0 .5em;line-height:1.5}
+.flags{display:grid;gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.flags li{background:var(--flag-bg);color:var(--flag-ink);border-left:4px solid var(--flag-line);padding:9px 12px;font-size:.92rem;line-height:1.45;border-radius:0 4px 4px 0}
+.flags li strong{font-weight:700}
+.flags:empty{display:none}
+
+.figs{display:grid;grid-template-columns:1.1fr 1.3fr 1.1fr 1fr;gap:0;margin:26px 0 8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fig{padding:14px 16px 14px 0;min-width:0}
+.fig+.fig{padding-left:16px;border-left:1px solid var(--line)}
+.fig .k{font-size:.82rem;color:var(--ink2);margin:0 0 2px;line-height:1.3}
+.fig .v{font-size:1.65rem;font-weight:700;line-height:1.15;font-variant-numeric:proportional-nums}
+.fig.hero .v{font-size:clamp(2.6rem,5vw,3.4rem);line-height:1;letter-spacing:-.02em}
+.fig .s{font-size:.8rem;color:var(--ink2);margin:4px 0 0;line-height:1.35}
+
+.chart{margin-top:38px}
+.chart h3{font-size:1.05rem;margin-bottom:2px}
+.chart .sub{font-size:.88rem;color:var(--ink2);margin:0 0 8px;line-height:1.4;max-width:70ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 6px;padding:0;list-style:none;font-size:.88rem;color:var(--ink)}
+.legend li{display:flex;align-items:center;gap:8px}
+.legend .key{display:inline-block;width:18px;height:0;border-top:3px solid;border-radius:2px;flex:none}
+.legend .band{display:inline-block;width:18px;height:10px;flex:none;border-radius:2px;background:color-mix(in srgb,var(--now) 22%,transparent)}
+.plot{position:relative;width:100%}
+.plot svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--page);padding:8px 10px;border-radius:4px;font-size:.82rem;line-height:1.4;min-width:190px;max-width:280px;z-index:3;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.tip .t{font-weight:700;margin-bottom:3px}
+.tip .r{display:flex;align-items:center;gap:7px}
+.tip .r i{display:inline-block;width:12px;border-top:3px solid;flex:none}
+.tip .r b{font-weight:700}
+svg text{font-family:var(--sans)}
+.ax{font-size:12px;fill:var(--ink2)}
+.axt{font-size:12px;fill:var(--ink2);font-weight:600}
+.lbl{font-size:12.5px;fill:var(--ink);font-weight:600;paint-order:stroke;stroke:var(--page);stroke-width:4px;stroke-linejoin:round}
+
+.tbl{margin-top:38px}
+.tbl h3{margin-bottom:2px}
+.scroll{overflow-x:auto;margin-top:8px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:.88rem;font-variant-numeric:tabular-nums}
+caption{text-align:left;font-size:.88rem;color:var(--ink2);padding:0 0 8px;caption-side:top;max-width:70ch;line-height:1.4}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);vertical-align:bottom}
+th:first-child,td:first-child{text-align:left;min-width:128px}
+thead th{font-weight:650;font-size:.8rem;color:var(--ink2);line-height:1.25;border-bottom:2px solid var(--ink)}
+tbody th{font-weight:600}
+tbody th,tbody td{vertical-align:top}
+tr.you th,tr.you td{background:color-mix(in srgb,var(--now) 13%,transparent);font-weight:700}
+
+/* below */
+.notice{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px 40px;margin:20px 0 0;padding:0;list-style:none;font-family:var(--sans)}
+.notice li{border-top:2px solid var(--ink);padding-top:12px;font-size:.95rem;line-height:1.5;color:var(--ink2)}
+.notice li strong{display:block;color:var(--ink);font-size:1rem;margin-bottom:4px}
+.say{display:grid;grid-template-columns:1fr 1fr;gap:28px 48px;margin-top:20px;font-family:var(--sans)}
+.say h3{margin-bottom:8px}
+.say ul{margin:0;padding-left:1.1em;font-size:.95rem;line-height:1.5;color:var(--ink2)}
+.say li{margin-bottom:6px}
+.say q{color:var(--ink);quotes:"“" "”"}
+.mini{font-family:var(--sans);margin-top:24px}
+.mini h3{margin-bottom:2px}
+.mini .scroll{margin-top:6px}
+.src{font-family:var(--sans);font-size:.92rem;color:var(--ink2);max-width:80ch}
+.src ol{padding-left:1.3em;margin:10px 0 0}
+.src li{margin-bottom:8px;line-height:1.45}
+footer{margin:64px 0 0;padding:28px 0 56px;border-top:1px solid var(--line);font-family:var(--sans);font-size:.9rem;color:var(--ink2)}
+details.how{font-family:var(--sans);margin-top:20px;max-width:75ch;font-size:.95rem;color:var(--ink2);line-height:1.55}
+details.how summary{cursor:pointer;font-weight:650;color:var(--ink)}
+details.how code{font-size:.9em;background:var(--panel);padding:1px 5px;border-radius:3px}
+.eqs{background:var(--panel);padding:12px 14px;border-radius:4px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;line-height:1.7;margin:10px 0;overflow-x:auto;color:var(--ink)}
+
+@media (max-width:959px){
+  .mast .wrap{grid-template-columns:1fr;gap:28px}
+  .wrap{padding:0 18px}
+  .explorer{grid-template-columns:1fr;gap:20px}
+  .controls{position:static}
+  .bar{display:block;position:sticky;top:0;z-index:5;background:var(--ink);color:var(--page);font-family:var(--sans);font-size:.88rem;line-height:1.35;padding:9px 14px;margin:0 -18px;font-variant-numeric:tabular-nums}
+  .bar b{font-weight:700}
+  .figs{grid-template-columns:1fr 1fr}
+  .fig:nth-child(odd){padding-left:0;border-left:0}
+  .fig:nth-child(n+3){border-top:1px solid var(--line)}
+  .say{grid-template-columns:1fr}
+  section{padding-top:44px}
+}
+@media (max-width:480px){
+  body{font-size:17px}
+  .fig .v{font-size:1.4rem}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<noscript><p style="padding:16px;font-family:system-ui">This explorer needs JavaScript to draw the sliders and charts.</p></noscript>
+
+<header class="mast">
+  <div class="wrap">
+    <div>
+      <h1>How much did climate change matter to this heat wave?</h1>
+      <p class="deck">A record heat wave is on the wire and your editor wants the climate angle. You can’t write that climate change “caused” it. You can often write how much it changed the odds. This page lets you test that sentence before you file it.</p>
+    </div>
+    <div class="who">
+      <p><strong>The decision-maker:</strong> a reporter covering a record heat wave, on deadline.</p>
+      <p><strong>The decision:</strong> what, if anything, can I say about climate change’s role, and how strongly can I say it, without overclaiming?</p>
+      <p><strong>Course concept:</strong> extreme event attribution, measured as <em>relative risk</em>: how many times more likely an event became.</p>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="ideas">
+  <div class="wrap">
+    <div class="prose">
+      <h2>Four ideas behind the sentence</h2>
+      <p>Attribution scientists ask a narrow question: how often would a heat wave <em>at least this hot</em> have happened in a world without human-caused warming, compared with now? Four measures come out of that comparison, and each one belongs in a different kind of sentence.</p>
+    </div>
+    <dl class="ideas">
+      <div><dt>Chance in any year, then and now</dt><dd>The odds that one year’s hottest day reaches this level or higher, in the 1850–1900 climate (<em>then</em>) and in today’s (<em>now</em>). Often quoted as “1 in 100 years.”<span class="eq">p<sub>then</sub> and p<sub>now</sub></span></dd></div>
+      <div><dt>Relative risk</dt><dd>How many times more likely the event is now. “10 times more likely” means a relative risk of 10. Attribution studies often call it the probability ratio.<span class="eq">RR = p<sub>now</sub> ÷ p<sub>then</sub></span></dd></div>
+      <div><dt>Share of the risk due to climate change</dt><dd>Of every 100 heat waves this extreme in today’s climate, how many would not have happened in the old climate. Also called the fraction of attributable risk.<span class="eq">1 − 1 ÷ RR</span></dd></div>
+      <div><dt>Intensity change</dt><dd>How much cooler a heat wave with the <em>same odds</em> would have been in the old climate. It answers “how much hotter?” where relative risk answers “how much more likely?”<span class="eq">change in °C at equal odds</span></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="explorer">
+  <div class="wrap">
+    <div class="prose">
+      <h2>Try the arithmetic</h2>
+      <p>Each year’s hottest day is a draw from a bell curve. Warming slides the curve toward higher temperatures. The record is a vertical line, and the shaded area to its right is the chance of a hottest day that hot or hotter. Move the sliders and watch what happens to the odds.</p>
+    </div>
+
+    <div class="explorer">
+      <aside class="controls" aria-label="Sliders">
+        <h2>Sliders</h2>
+        <p class="lead">Defaults describe a typical land location today. Every range and its source are listed under “Where the numbers come from.”</p>
+
+        <div class="grp">
+          <h3>The event</h3>
+          <div class="ctl">
+            <label for="E">How extreme was the record? <output id="oE" for="E"></output></label>
+            <input id="E" type="range" min="0" max="9" step="0.1" value="4.5">
+            <p class="help">Degrees above the typical hottest day of the year in 1850–1900. 0 is an ordinary hottest day; 5 or more smashes old records.</p>
+            <p class="derived" id="dE"></p>
+          </div>
+        </div>
+
+        <div class="grp">
+          <h3>The place</h3>
+          <div class="ctl">
+            <label for="S">How much does the hottest day change from year to year? <output id="oS" for="S"></output></label>
+            <input id="S" type="range" min="0.8" max="3.5" step="0.1" value="1.8">
+            <p class="help">The standard deviation of the yearly hottest day. Steady tropical coasts sit low; continental interiors sit high. 1.8 °C reproduces the IPCC’s land-wide numbers.</p>
+          </div>
+        </div>
+
+        <div class="grp">
+          <h3>The climate</h3>
+          <div class="ctl">
+            <label for="T">How much have the hottest days warmed? <output id="oT" for="T"></output></label>
+            <input id="T" type="range" min="0" max="5" step="0.1" value="1.8">
+            <p class="help">How far warming has slid the whole curve. 1.8 °C matches today’s global warming (about 1.4 °C) as it plays out over land. About 2.6 °C matches a 2 °C world.</p>
+          </div>
+          <div class="ctl">
+            <label for="C">Has the spread changed too? <output id="oC" for="C"></output></label>
+            <input id="C" type="range" min="-20" max="40" step="5" value="0">
+            <p class="help">0% means the curve only slides. A positive value means it also widens, which fattens the hot tail. Some regions show this; many analyses assume none.</p>
+          </div>
+        </div>
+
+        <div class="grp">
+          <h3>Start from a case</h3>
+          <div class="presets" id="presets" role="group" aria-label="Preset cases"></div>
+          <p class="help" style="margin-top:10px">Illustrative cases, not re-creations of real events.</p>
+          <button class="reset" id="reset" type="button">Reset sliders</button>
+        </div>
+      </aside>
+
+      <div class="results">
+        <div class="bar" id="bar" aria-hidden="true"></div>
+
+        <p class="wire" id="wire" aria-live="polite"></p>
+        <p class="ctxt" id="ctxt"></p>
+        <p class="ctxt" id="sens"></p>
+        <ul class="flags" id="flags"></ul>
+
+        <div class="figs" id="figs"></div>
+
+        <div class="chart">
+          <h3 id="c1t">Chance that a year’s hottest day reaches the record: then vs. now</h3>
+          <p class="sub">Each curve shows how often a year’s single hottest day lands at each temperature. The shaded tails are the chance of reaching the record or higher. Hover to read the odds at any temperature.</p>
+          <ul class="legend" id="leg1"></ul>
+          <div class="plot" id="chart1"><div class="tip" id="tip1"></div></div>
+        </div>
+
+        <div class="chart">
+          <h3 id="c2t">How much climate change raises the odds as the record gets more extreme</h3>
+          <p class="sub">Relative risk on a log scale, for every possible record height. The dot is your event. The shaded band shows the answer if the warming estimate were 25% smaller or larger.</p>
+          <ul class="legend" id="leg2"></ul>
+          <div class="plot" id="chart2"><div class="tip" id="tip2"></div></div>
+        </div>
+
+        <div class="tbl">
+          <h3>Your event next to standard heat levels</h3>
+          <div class="scroll">
+            <table id="tbl">
+              <caption>Same place and same climate settings as the sliders. The first row is your event; the rest are heat levels defined by how rare they were in 1850–1900. Percentages are the chance in any single year.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Heat level (how often in 1850–1900)</th>
+                  <th scope="col">Temperature (°C above old typical hottest day)</th>
+                  <th scope="col">Chance in a year, then (%)</th>
+                  <th scope="col">Chance in a year, now (%)</th>
+                  <th scope="col">Relative risk (× more likely)</th>
+                  <th scope="col">Share of risk due to climate change (%)</th>
+                  <th scope="col">Hotter than a same-odds event then (°C)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="notice">
+  <div class="wrap">
+    <div class="prose"><h2>What to notice as you move the sliders</h2></div>
+    <ul class="notice">
+      <li><strong>Rarer records gain the most.</strong> Hold warming fixed and raise the record. Relative risk climbs steeply because the shift pushes a bigger share of years over a high bar. The curve in the second chart bends upward for this reason.</li>
+      <li><strong>The same warming means more in a steady climate.</strong> Pull the variability slider down. A 1.8 °C shift is a modest nudge where hot days swing by 3 °C and a huge one where they swing by 1 °C. Try the tropical case.</li>
+      <li><strong>The far tail is fuzzy.</strong> Push the record up until the odds then fall below 1 in 1,000. The band in the second chart fans out and a warning appears. This is why published studies say “at least.”</li>
+      <li><strong>The spread matters on its own.</strong> Set warming to 0 and widen the spread. Relative risk still rises. Attribution studies test this because it can change the answer.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="say">
+  <div class="wrap">
+    <div class="prose">
+      <h2>What you can defensibly write</h2>
+      <p>The box above the charts rewrites itself as you move the sliders. These habits hold at any setting.</p>
+    </div>
+    <div class="say">
+      <div>
+        <h3>Safe</h3>
+        <ul>
+          <li><q>Human-caused climate change made a heat wave like this about X times more likely.</q></li>
+          <li><q>…and about Y °C hotter than it would have been in the 1850–1900 climate.</q></li>
+          <li>“At least” wording when the event is far out in the tail.</li>
+          <li>Name the study, the region and the exact event definition (hottest day or multi-day average).</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Avoid</h3>
+        <ul>
+          <li>“Climate change caused this heat wave.” Weather has many causes; attribution measures a change in odds.</li>
+          <li>A single exact number with no range or “at least.”</li>
+          <li>Treating “91% of the risk” as “91% of the heat.” It describes odds, not temperature.</li>
+          <li>Quoting this page. It is a classroom model. Quote a peer-reviewed or rapid-attribution study of your event.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <div class="prose">
+      <h2>Where the numbers come from</h2>
+      <p>The model treats each year’s hottest day as a normal (bell-curve) draw. Climate change shifts the average by the warming slider and can change the spread. The defaults are not guesses: we fitted this model to the IPCC’s published hot-extreme numbers.</p>
+    </div>
+
+    <div class="mini">
+      <h3>Check 1: does the model reproduce the IPCC?</h3>
+      <p class="src" style="margin:2px 0 0">The IPCC (AR6, Summary for Policymakers, Figure SPM.6) gives, for a hot extreme over land that happened once in 10 years in 1850–1900, how much more often and how much hotter it gets at each global warming level. Fitting a bell curve to those four rows gives a spread of about 1.8 °C and a local shift of about 0.71 spreads per °C of global warming (1.28 °C of local shift per °C of global warming). Those fitted values are the slider defaults.</p>
+      <div class="scroll">
+        <table id="cal" style="min-width:560px">
+          <caption>One-in-10-year hot extreme over land. IPCC columns are published values; model columns are computed live from the same code that drives the sliders, using spread 1.8 °C and shift 1.28 °C per °C of global warming.</caption>
+          <thead><tr>
+            <th scope="col">Global warming (°C above 1850–1900)</th>
+            <th scope="col">IPCC: times more frequent (×)</th>
+            <th scope="col">This model: times more frequent (×)</th>
+            <th scope="col">IPCC: hotter by (°C)</th>
+            <th scope="col">This model: hotter by (°C)</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mini">
+      <h3>Check 2: how do real attribution studies compare?</h3>
+      <div class="scroll">
+        <table style="min-width:620px">
+          <caption>Published results from World Weather Attribution (WWA), the group whose method many reporters cite. Their studies fit extreme-value statistics to station data and climate models, so their numbers differ from this simple model. Rows are results as WWA reported them.</caption>
+          <thead><tr>
+            <th scope="col">Event</th>
+            <th scope="col">Relative risk reported (× more likely)</th>
+            <th scope="col">Rarity in today’s climate (1 in N years)</th>
+            <th scope="col">Hotter than without warming (°C)</th>
+          </tr></thead>
+          <tbody>
+            <tr><th scope="row">Pacific Northwest, June 2021 (daily maximum)</th><td>at least 150</td><td>about 1,000</td><td>about 2</td></tr>
+            <tr><th scope="row">United Kingdom, July 2022 (40 °C)</th><td>at least 10</td><td>“still rare” (no figure given)</td><td>about 4</td></tr>
+            <tr><th scope="row">US Southwest and Mexico, July 2023 (18-day heat)</th><td>“virtually impossible” without warming</td><td>about 15</td><td>about 2</td></tr>
+            <tr><th scope="row">Southern Europe, July 2023 (7-day heat)</th><td>“virtually impossible” without warming</td><td>about 10</td><td>about 2.5</td></tr>
+            <tr><th scope="row">China, July 2023 (14-day heat)</th><td>at least 50</td><td>about 5</td><td>about 1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="src" style="margin-top:10px">Notice the same pattern as in the second chart: the rarer an event was in the old climate, the bigger the multiplier. China’s 2023 heat was about a 1-in-250 event in the old climate and got “at least 50”; the 2021 heat dome, far rarer, got “at least 150.” WWA gives lower bounds for the rarest events because estimates that far out in the tail are very uncertain.</p>
+    </div>
+
+    <div class="mini">
+      <h3>Slider ranges and defaults</h3>
+      <div class="scroll">
+        <table style="min-width:620px">
+          <caption>What each slider means physically, its range, its default and why.</caption>
+          <thead><tr>
+            <th scope="col">Slider</th>
+            <th scope="col">Range (°C)</th>
+            <th scope="col">Default (°C)</th>
+            <th scope="col">Basis</th>
+          </tr></thead>
+          <tbody>
+            <tr><th scope="row">Record extremeness</th><td>0 to 9</td><td>4.5</td><td style="text-align:left">With the default spread, 4.5 °C is a 1-in-160 event in 1850–1900 and about 1-in-15 now, close to the “about once every 15 years” WWA found for the July 2023 heat in the US and Mexico. 9 °C is beyond 1 in a million years.</td></tr>
+            <tr><th scope="row">Year-to-year variability</th><td>0.8 to 3.5</td><td>1.8</td><td style="text-align:left">1.8 °C is fitted to the IPCC numbers above. The range brackets it to show steady versus swingy climates. It is our own range: check it against your station’s record of yearly hottest days.</td></tr>
+            <tr><th scope="row">Warming of hot days</th><td>0 to 5</td><td>1.8</td><td style="text-align:left">Global warming was 1.43 ± 0.13 °C above 1850–1900 in 2025 (WMO). Times the fitted 1.28 land factor, that is 1.8 °C. At 4 °C global warming the IPCC’s hot extreme is about 5 °C hotter, hence the top of the range.</td></tr>
+            <tr><th scope="row">Change in spread</th><td>−20% to +40%</td><td>0%</td><td style="text-align:left">The IPCC fit needs no change in spread, so 0% is the default. The range lets you explore regions where the spread of heat is also changing.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <details class="how">
+      <summary>The math and the model’s limits</summary>
+      <p>Let <code>E</code> be the record’s height above the 1850–1900 mean, <code>σ</code> the spread then, <code>ΔT</code> the warming shift and <code>c</code> the change in spread. With Q the upper tail of the standard normal:</p>
+      <div class="eqs">p_then = Q( E / σ )<br>p_now = Q( (E − ΔT) / (σ(1+c)) )<br>RR = p_now / p_then<br>share of risk = 1 − 1 / RR<br>intensity change = E − σ · (E − ΔT) / (σ(1+c))</div>
+      <p>Limits to say out loud: real hottest-day data are not perfectly bell-shaped, and attribution studies use extreme-value statistics and climate models. Far-tail results swing a lot with the assumed shape, which is why we cap the language and show a sensitivity band. The model also says nothing about <em>why</em> a particular heat dome formed. And a station or region needs its own event definition (hottest day, three-day mean, area average) because the answer changes with it.</p>
+    </details>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <div class="src">
+      <h2>Sources</h2>
+      <ol>
+        <li>IPCC, <em>Climate Change 2021: The Physical Science Basis</em>, Summary for Policymakers, Figure SPM.6 (frequency and intensity of hot extremes over land). <a href="https://www.ipcc.ch/report/ar6/wg1/figures/summary-for-policymakers/figure-spm-6">ipcc.ch</a></li>
+        <li>World Meteorological Organization, <em>State of the Global Climate 2025</em> (2025: about 1.43 ± 0.13 °C above 1850–1900). <a href="https://wmo.int/node/38416">wmo.int</a></li>
+        <li>World Weather Attribution, “Western North American extreme heat virtually impossible without human-caused climate change” (2021). <a href="https://worldweatherattribution.org/western-north-american-extreme-heat-virtually-impossible-without-human-caused-climate-change/">worldweatherattribution.org</a></li>
+        <li>World Weather Attribution, “Without human-caused climate change temperatures of 40°C in the UK would have been extremely unlikely” (2022). <a href="https://www.worldweatherattribution.org/?p=1669">worldweatherattribution.org</a>. The 4 °C figure is as reported by <a href="https://www.carbonbrief.org/climate-change-made-2022s-uk-heatwave-at-least-10-times-more-likely/">Carbon Brief</a>.</li>
+        <li>World Weather Attribution, “Extreme heat in North America, Europe and China in July 2023 made much more likely by climate change.” <a href="https://www.worldweatherattribution.org/extreme-heat-in-north-america-europe-and-china-in-july-2023-made-much-more-likely-by-climate-change/">worldweatherattribution.org</a></li>
+        <li>Philip, S. et al. (2020), “A protocol for probabilistic extreme event attribution analyses,” <em>Advances in Statistical Climatology, Meteorology and Oceanography</em> 6, 177–203. <a href="https://doi.org/10.5194/ascmo-6-177-2020">doi:10.5194/ascmo-6-177-2020</a></li>
+        <li>Stott, P. A., Stone, D. A. &amp; Allen, M. R. (2004), “Human contribution to the European heatwave of 2003,” <em>Nature</em> 432, 610–614 (origin of the “fraction of attributable risk”). <a href="https://doi.org/10.1038/nature03089">doi:10.1038/nature03089</a></li>
+        <li>National Academies of Sciences, Engineering, and Medicine (2016), <em>Attribution of Extreme Weather Events in the Context of Climate Change</em>. <a href="https://doi.org/10.17226/21852">doi:10.17226/21852</a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    A classroom explainer built with Claude Code. The model is a simplified teaching tool and not a substitute for a published attribution study.
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- statistics ---------- */
+// Complementary error function (Numerical Recipes erfcc). Relative error < 1.2e-7 everywhere,
+// so far-tail probabilities stay accurate instead of rounding to zero.
+function erfc(x){
+  var z=Math.abs(x), t=1/(1+0.5*z);
+  var r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));
+  return x>=0?r:2-r;
+}
+function Q(z){ return 0.5*erfc(z/Math.SQRT2); }          // P(Z > z)
+function pdfPct(v,mu,s){ return 100*Math.exp(-0.5*Math.pow((v-mu)/s,2))/(s*Math.sqrt(2*Math.PI)); } // % of years per °C
+
+// E: record height above the 1850-1900 mean (°C); s0: spread then; dT: shift; c: fractional change in spread
+function model(E,s0,dT,c){
+  var s1=s0*(1+c), z0=E/s0, z1=(E-dT)/s1;
+  var p0=Q(z0), p1=Q(z1), rr=p1/p0;
+  return {E:E,s0:s0,s1:s1,dT:dT,c:c,z0:z0,z1:z1,p0:p0,p1:p1,rr:rr,far:1-p0/p1,dI:E-s0*z1};
+}
+
+/* ---------- formatting ---------- */
+function comma(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+function fmtTimes(x){
+  if(!isFinite(x)) return 'more than 1,000,000';
+  if(x>=1e6) return 'more than 1,000,000';
+  if(x>=100) return comma(Number(x.toPrecision(2)));
+  if(x>=10) return String(Math.round(x));
+  return x.toFixed(1);
+}
+function fmtRR(x){ return (x>=1e6||!isFinite(x))?'>1,000,000':fmtTimes(x); }
+function oneIn(p){
+  if(!(p>0)) return 'more than 1,000,000';
+  var n=1/p;
+  if(n>=1e6) return 'more than 1,000,000';
+  if(n>=100) return comma(Number(n.toPrecision(2)));
+  if(n>=10) return String(Math.round(n));
+  return n.toFixed(1);
+}
+function fmtPct(p){
+  var v=p*100;
+  if(v>=99.5) return '>99';
+  if(v>=10) return v.toFixed(0);
+  if(v>=1) return v.toFixed(1);
+  if(v>=0.01) return v.toFixed(2);
+  return '<0.01';
+}
+function signed(x,d){ var s=x.toFixed(d); return (x>0?'+':'')+s; }
+function atLeast(x){
+  if(!isFinite(x)||x>=1e6) return 1000000;
+  if(x<10) return Math.max(1,Math.floor(x));
+  var m=Math.pow(10,Math.floor(Math.log10(x)));
+  return Math.floor(x/m)*m;
+}
+
+/* ---------- state & controls ---------- */
+var DEFAULTS={E:4.5,S:1.8,T:1.8,C:0};
+var state={E:4.5,S:1.8,T:1.8,C:0};
+var PRESETS=[
+  {name:'Ordinary hot spell',    v:{E:2.0,S:1.8,T:1.8,C:0}},
+  {name:'Record-smashing heat dome', v:{E:7.4,S:1.8,T:1.8,C:0}},
+  {name:'Steady tropical climate',   v:{E:2.0,S:0.9,T:1.2,C:0}},
+  {name:'Big-swing continental climate', v:{E:6.0,S:3.0,T:1.8,C:0}},
+  {name:'Spread widens, no warming', v:{E:4.5,S:1.8,T:0,C:30}}
+];
+var ids={E:'E',S:'S',T:'T',C:'C'};
+function $(id){ return document.getElementById(id); }
+
+function readState(){
+  state.E=parseFloat($('E').value); state.S=parseFloat($('S').value);
+  state.T=parseFloat($('T').value); state.C=parseFloat($('C').value);
+}
+function writeSliders(v){
+  $('E').value=v.E; $('S').value=v.S; $('T').value=v.T; $('C').value=v.C;
+}
+function cur(){ return model(state.E,state.S,state.T,state.C/100); }
+
+var presetBtns=[];
+(function buildPresets(){
+  var host=$('presets');
+  PRESETS.forEach(function(p,i){
+    var b=document.createElement('button'); b.type='button'; b.textContent=p.name; b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',function(){ writeSliders(p.v); update(); });
+    host.appendChild(b); presetBtns.push(b);
+  });
+})();
+$('reset').addEventListener('click',function(){ writeSliders(DEFAULTS); update(); });
+['E','S','T','C'].forEach(function(k){ $(k).addEventListener('input',update); });
+
+function matchesPreset(p){
+  return Math.abs(p.v.E-state.E)<1e-9&&Math.abs(p.v.S-state.S)<1e-9&&Math.abs(p.v.T-state.T)<1e-9&&Math.abs(p.v.C-state.C)<1e-9;
+}
+
+/* ---------- text outputs ---------- */
+function setHTML(id,html){ $(id).innerHTML=html; }
+
+function updateText(r){
+  $('oE').textContent=signed(state.E,1)+' °C';
+  $('oS').textContent=state.S.toFixed(1)+' °C';
+  $('oT').textContent=signed(state.T,1)+' °C';
+  $('oC').textContent=signed(state.C,0)+'%';
+  var rel=state.E-state.T;
+  $('dE').textContent='= '+(rel>=0?'+':'')+rel.toFixed(1)+' °C compared with today’s typical hottest day';
+
+  // sensitivity: warming 25% smaller / larger
+  var lo=model(state.E,state.S,state.T*0.75,state.C/100), hi=model(state.E,state.S,state.T*1.25,state.C/100);
+  var rr=r.rr, flags=[];
+  var tail=r.p0<1e-3, farTail=r.p0<1e-6;
+  var headline, ctx='';
+  var heat=(r.dI>=0.05)?(' and about <b>'+r.dI.toFixed(1)+' °C hotter</b>'):'';
+  if(rr<0.95){
+    headline='In this setup, an event this extreme became <b>less likely</b>. The wider-or-narrower spread outweighs the warming, so there is no attribution story to tell.';
+    flags.push('<strong>Check your assumptions.</strong> A result like this usually means the spread setting is doing the work. Real studies would investigate before writing anything.');
+  }else if(rr<1.25){
+    headline='The odds <b>barely changed</b> for an event this extreme. Don’t write that climate change made it more likely.';
+  }else if(rr<2){
+    headline='Climate change made an event this extreme about <b>'+fmtTimes(rr)+' times more likely</b>'+heat+' than it would have been in the 1850–1900 climate. That is a modest shift, so say so.';
+  }else if(rr<10&&!tail){
+    headline='Human-caused climate change made an event this extreme about <b>'+fmtTimes(rr)+' times more likely</b>'+heat+' than it would have been in the 1850–1900 climate.';
+  }else{
+    var lb=atLeast(lo.rr);
+    headline='Human-caused climate change made an event this extreme <b>at least '+comma(lb)+' times more likely</b>'+heat+' than it would have been in the 1850–1900 climate.';
+  }
+  if(rr>=1.25){
+    var nowN=1/r.p1;
+    ctx=(nowN<=20)
+      ? 'Even so, an event this hot is <b>not rare</b> in today’s climate: about 1 in '+oneIn(r.p1)+' years.'
+      : 'An event this hot is <b>still rare</b> in today’s climate: about 1 in '+oneIn(r.p1)+' years.';
+  }
+  setHTML('wire',headline);
+  setHTML('ctxt',ctx);
+  var spread=(rr>=1.25)?('Sensitivity: if the warming estimate were 25% smaller or larger, relative risk would range from <b>'+fmtRR(lo.rr)+'×</b> to <b>'+fmtRR(hi.rr)+'×</b>.'):'';
+  if(rr>=1.25&&hi.rr/lo.rr>2) spread+=' A range this wide is why published studies give “at least” numbers.';
+  if(rr>=10||tail) spread+=' The “at least” wording in the sentence above uses the low end of that range.';
+  setHTML('sens',spread);
+
+  if(farTail) flags.push('<strong>Beyond 1 in 1,000,000 years then.</strong> Bell-curve tails can’t be trusted this far out. Published studies report only a lower bound, so treat the multiplier as “at least” and say the event was effectively impossible without warming.');
+  else if(tail) flags.push('<strong>Rarer than 1 in 1,000 years then.</strong> Estimates this far out in the tail are very uncertain. Published studies, such as WWA’s on the 2021 Pacific Northwest heat dome, report only a lower bound (“at least 150 times”). Use “at least.”');
+  if(Math.abs(state.C)>0&&rr>=0.95) flags.push('<strong>You changed the spread.</strong> That is a modeling choice, not a measurement. Attribution scientists test it because it can change the answer, and the IPCC numbers need none.');
+  if(rr>=1.25&&!tail&&hi.rr/lo.rr>3) flags.push('<strong>Wide sensitivity.</strong> The answer depends heavily on the warming estimate. Quote a range or ask the study authors which end they stand behind.');
+  setHTML('flags',flags.map(function(f){return '<li>'+f+'</li>';}).join(''));
+
+  // figure strip
+  var farTxt=(r.far>0)?(r.far*100>=99.5?'>99%':(r.far*100).toFixed(0)+'%'):'none';
+  setHTML('figs',
+    '<div class="fig hero"><p class="k">Relative risk</p><div class="v">'+fmtRR(rr)+'×</div><p class="s">times more likely than in 1850–1900</p></div>'+
+    '<div class="fig"><p class="k">Chance in any year, now</p><div class="v">'+fmtPct(r.p1)+'%</div><p class="s">up from '+fmtPct(r.p0)+'% in 1850–1900 (1 in '+oneIn(r.p0)+' → 1 in '+oneIn(r.p1)+' years)</p></div>'+
+    '<div class="fig"><p class="k">Share of the risk due to climate change</p><div class="v">'+farTxt+'</div><p class="s">of heat waves this extreme today would not have happened then</p></div>'+
+    '<div class="fig"><p class="k">Hotter than a same-odds event then</p><div class="v">'+signed(r.dI,1)+' °C</div><p class="s">intensity change</p></div>');
+
+  setHTML('bar','Relative risk <b>'+fmtRR(rr)+'×</b> &nbsp;·&nbsp; Odds per year <b>1 in '+oneIn(r.p0)+' → 1 in '+oneIn(r.p1)+'</b>');
+
+  presetBtns.forEach(function(b,i){ b.setAttribute('aria-pressed',matchesPreset(PRESETS[i])?'true':'false'); });
+}
+
+/* ---------- table ---------- */
+var LEVELS=[{n:10,z:1.2815516},{n:50,z:2.0537489},{n:100,z:2.3263479},{n:1000,z:3.0902323}];
+function updateTable(r){
+  var rows=[];
+  function row(label,E,you){
+    var m=model(E,state.S,state.T,state.C/100);
+    var farTxt=m.far>0?(m.far*100>=99.5?'>99':(m.far*100).toFixed(m.far*100>=10?0:1)):'0';
+    return '<tr'+(you?' class="you"':'')+'><th scope="row">'+label+'</th><td>'+signed(E,1)+'</td><td>'+fmtPct(m.p0)+'</td><td>'+fmtPct(m.p1)+'</td><td>'+fmtRR(m.rr)+'</td><td>'+farTxt+'</td><td>'+signed(m.dI,1)+'</td></tr>';
+  }
+  rows.push(row('Your event (slider)',state.E,true));
+  LEVELS.forEach(function(L){ rows.push(row('1 in '+comma(L.n)+' years',state.S*L.z,false)); });
+  document.querySelector('#tbl tbody').innerHTML=rows.join('');
+}
+
+/* ---------- calibration table (static inputs, live model) ---------- */
+(function(){
+  var AR6=[[1,2.8,1.2],[1.5,4.1,1.9],[2,5.6,2.6],[4,9.4,5.1]];
+  var z10=1.2815516, S=1.8, K=1.28;
+  document.querySelector('#cal tbody').innerHTML=AR6.map(function(a){
+    var m=model(z10*S,S,K*a[0],0);
+    return '<tr><th scope="row">'+a[0]+'</th><td>'+a[1].toFixed(1)+'</td><td>'+(m.p1*10).toFixed(1)+'</td><td>+'+a[2].toFixed(1)+'</td><td>+'+(K*a[0]).toFixed(1)+'</td></tr>';
+  }).join('');
+})();
+
+/* ---------- SVG helpers ---------- */
+var NS='http://www.w3.org/2000/svg';
+function el(name,attrs,parent){
+  var n=document.createElementNS(NS,name);
+  for(var k in attrs){ if(Object.prototype.hasOwnProperty.call(attrs,k)) n.setAttribute(k,attrs[k]); }
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function txt(parent,x,y,str,cls,anchor){
+  var t=el('text',{x:x,y:y,'class':cls,'text-anchor':anchor||'start'},parent); t.textContent=str; return t;
+}
+function fitText(parent,x,y,options,cls,anchor,maxW){
+  var t=txt(parent,x,y,options[0],cls,anchor);
+  for(var i=1;i<options.length&&t.getComputedTextLength()>maxW;i++) t.textContent=options[i];
+  return t;
+}
+function niceStep(max){
+  var raw=max/4, mag=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/mag;
+  return (f<=1?1:f<=2?2:f<=5?5:10)*mag;
+}
+function tipRows(tip,title,rows){
+  tip.textContent='';
+  var t=document.createElement('div'); t.className='t'; t.textContent=title; tip.appendChild(t);
+  rows.forEach(function(r){
+    var d=document.createElement('div'); d.className='r';
+    var i=document.createElement('i'); i.style.borderTopColor=r.color; d.appendChild(i);
+    var s=document.createElement('span'); s.textContent=r.label+' '; d.appendChild(s);
+    var b=document.createElement('b'); b.textContent=r.value; d.appendChild(b);
+    tip.appendChild(d);
+  });
+}
+function placeTip(tip,host,px,py){
+  tip.style.display='block';
+  var w=tip.offsetWidth, hw=host.clientWidth;
+  var left=px+14; if(left+w>hw) left=px-w-14; if(left<0) left=0;
+  tip.style.left=left+'px'; tip.style.top=Math.max(0,py-20)+'px';
+}
+
+/* ---------- chart 1: bell curves ---------- */
+function drawDist(r){
+  var host=$('chart1'), tip=$('tip1');
+  var old=host.querySelector('svg'); if(old) host.removeChild(old);
+  var W=Math.max(300,host.clientWidth), H=W<520?300:340;
+  var m={l:50,r:14,t:14,b:52}, iw=W-m.l-m.r, ih=H-m.t-m.b;
+  var x0=-8, x1=14;
+  function X(v){ return m.l+(v-x0)/(x1-x0)*iw; }
+  var peak=Math.max(pdfPct(0,0,r.s0),pdfPct(r.dT,r.dT,r.s1));
+  var step=niceStep(peak*1.25), ymax=Math.ceil(peak*1.25/step)*step;
+  function Y(v){ return m.t+ih-(v/ymax)*ih; }
+
+  var svg=el('svg',{viewBox:'0 0 '+W+' '+H,width:W,height:H,role:'img','aria-labelledby':'c1t c1d'},host);
+  var desc=el('desc',{id:'c1d'},svg);
+  desc.textContent='Two bell curves of the yearly hottest day, one for 1850 to 1900 and one for today, with the record marked. The chance of reaching the record is 1 in '+oneIn(r.p0)+' years then and 1 in '+oneIn(r.p1)+' years now.';
+  var cid='clip1';
+  var defs=el('defs',{},svg), cp=el('clipPath',{id:cid},defs);
+  el('rect',{x:m.l,y:m.t,width:iw,height:ih},cp);
+
+  // grid + axes
+  for(var g=0;g<=ymax+1e-9;g+=step){
+    el('line',{x1:m.l,x2:W-m.r,y1:Y(g),y2:Y(g),stroke:'var(--grid)','stroke-width':1},svg);
+    txt(svg,m.l-8,Y(g)+4,String(Math.round(g*100)/100),'ax','end');
+  }
+  var xs1=iw<420?4:2;
+  for(var xv=x0;xv<=x1;xv+=xs1){
+    txt(svg,X(xv),H-m.b+18,(xv>0?'+':'')+xv,'ax','middle');
+  }
+  el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,stroke:'var(--ink3)','stroke-width':1},svg);
+  fitText(svg,m.l+iw/2,H-8,['Hottest day of the year (°C above the typical hottest day in 1850–1900)','Hottest day of the year (°C above 1850–1900 typical)','Hottest day of the year (°C vs. 1850–1900)'],'axt','middle',iw+m.l-4);
+  var yt=txt(svg,0,0,'Share of years (% per 1 °C)','axt','middle');
+  yt.setAttribute('transform','translate(13,'+(m.t+ih/2)+') rotate(-90)');
+
+  var plot=el('g',{'clip-path':'url(#'+cid+')'},svg);
+  function pathFor(mu,s,from,to){
+    var d='',first=true;
+    for(var v=from;v<=to+1e-9;v+=0.1){ d+=(first?'M':'L')+X(v).toFixed(1)+' '+Y(pdfPct(v,mu,s)).toFixed(1)+' '; first=false; }
+    return d;
+  }
+  function area(mu,s,from,to,color,op){
+    var d=pathFor(mu,s,from,to);
+    d+='L'+X(to).toFixed(1)+' '+Y(0).toFixed(1)+' L'+X(from).toFixed(1)+' '+Y(0).toFixed(1)+' Z';
+    el('path',{d:d,fill:color,'fill-opacity':op,stroke:'none'},plot);
+  }
+  area(0,r.s0,x0,x1,'var(--then)',0.10);
+  area(r.dT,r.s1,x0,x1,'var(--now)',0.10);
+  var eC=Math.min(r.E,x1);
+  area(0,r.s0,eC,x1,'var(--then)',0.55);
+  area(r.dT,r.s1,eC,x1,'var(--now)',0.55);
+  el('path',{d:pathFor(0,r.s0,x0,x1),fill:'none',stroke:'var(--then)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},plot);
+  el('path',{d:pathFor(r.dT,r.s1,x0,x1),fill:'none',stroke:'var(--now)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},plot);
+
+  // record line + label
+  var ex=X(Math.min(r.E,x1));
+  el('line',{x1:ex,x2:ex,y1:m.t,y2:H-m.b,stroke:'var(--ink)','stroke-width':1.5},svg);
+  var lab='Record '+signed(r.E,1)+' °C', right=(ex+8+lab.length*7.2)<(W-m.r);
+  txt(svg,right?ex+6:ex-6,m.t+12,lab,'lbl',right?'start':'end');
+
+  // direct labels above the two peaks (stacked if the peaks are close together)
+  var p0pk=pdfPct(0,0,r.s0), p1pk=pdfPct(r.dT,r.dT,r.s1);
+  var labY=Y(Math.max(p0pk,p1pk))-8, gapPx=X(r.dT)-X(0);
+  txt(svg,X(0)+10,labY-(gapPx<24?16:0),'1850–1900','lbl','end');
+  txt(svg,X(r.dT)-10,labY,'Today','lbl','start');
+
+  // hover
+  var cross=el('line',{x1:0,x2:0,y1:m.t,y2:H-m.b,stroke:'var(--ink3)','stroke-width':1,visibility:'hidden'},svg);
+  var dot0=el('circle',{r:4,fill:'var(--then)',stroke:'var(--page)','stroke-width':2,visibility:'hidden'},svg);
+  var dot1=el('circle',{r:4,fill:'var(--now)',stroke:'var(--page)','stroke-width':2,visibility:'hidden'},svg);
+  var ov=el('rect',{x:m.l,y:m.t,width:iw,height:ih,fill:'transparent','pointer-events':'all'},svg);
+  function move(ev){
+    var b=svg.getBoundingClientRect();
+    var px=(ev.clientX-b.left)*(W/b.width), py=(ev.clientY-b.top)*(H/b.height);
+    var v=x0+(px-m.l)/iw*(x1-x0); v=Math.max(x0,Math.min(x1,v));
+    var q0=Q(v/r.s0), q1=Q((v-r.dT)/r.s1);
+    cross.setAttribute('x1',X(v)); cross.setAttribute('x2',X(v)); cross.setAttribute('visibility','visible');
+    dot0.setAttribute('cx',X(v)); dot0.setAttribute('cy',Y(pdfPct(v,0,r.s0))); dot0.setAttribute('visibility','visible');
+    dot1.setAttribute('cx',X(v)); dot1.setAttribute('cy',Y(pdfPct(v,r.dT,r.s1))); dot1.setAttribute('visibility','visible');
+    tipRows(tip,'Hottest day '+signed(v,1)+' °C or hotter',[
+      {color:'var(--then)',label:'1850–1900: 1 in',value:oneIn(q0)+' years ('+fmtPct(q0)+'%)'},
+      {color:'var(--now)',label:'Today: 1 in',value:oneIn(q1)+' years ('+fmtPct(q1)+'%)'}
+    ]);
+    placeTip(tip,host,(X(v)),py);
+  }
+  function leave(){ cross.setAttribute('visibility','hidden'); dot0.setAttribute('visibility','hidden'); dot1.setAttribute('visibility','hidden'); tip.style.display='none'; }
+  ov.addEventListener('pointermove',move); ov.addEventListener('pointerleave',leave);
+}
+
+/* ---------- chart 2: relative risk vs record height ---------- */
+function drawRR(r){
+  var host=$('chart2'), tip=$('tip2');
+  var old=host.querySelector('svg'); if(old) host.removeChild(old);
+  var W=Math.max(300,host.clientWidth), H=W<520?290:320;
+  var xa=0, xb=9;
+
+  var pts=[];
+  for(var e=xa;e<=xb+1e-9;e+=0.1){
+    var c0=model(e,state.S,state.T,state.C/100).rr;
+    var cl=model(e,state.S,state.T*0.75,state.C/100).rr;
+    var ch=model(e,state.S,state.T*1.25,state.C/100).rr;
+    pts.push({e:e,rr:c0,lo:Math.min(cl,ch),hi:Math.max(cl,ch)});
+  }
+  var maxV=1, minV=Infinity;
+  pts.forEach(function(p){ if(isFinite(p.hi)) maxV=Math.max(maxV,p.hi); minV=Math.min(minV,p.lo); });
+  var k=Math.min(4,Math.max(1,Math.ceil(Math.log10(maxV*1.05))));   // axis tops out at 10,000x; the table and headline carry bigger numbers
+  var lmin=(minV<0.98)?-1:0;
+  var L0=lmin, L1=k;
+  var widest=(k>=3?comma(Math.pow(10,k)):String(Math.pow(10,k)))+'×';
+  var m={l:Math.max(52,36+widest.length*7),r:16,t:16,b:52}, iw=W-m.l-m.r, ih=H-m.t-m.b;
+  function X(v){ return m.l+(v-xa)/(xb-xa)*iw; }
+  function Y(v){ var l=Math.log10(Math.max(v,Math.pow(10,L0-1))); l=Math.max(L0,Math.min(L1,l)); return m.t+ih-(l-L0)/(L1-L0)*ih; }
+  // unclamped version for the curves: values above the axis run off the top and get clipped, instead of drawing a false plateau
+  function YR(v){ var l=Math.log10(Math.min(Math.max(v,1e-6),1e300)); return m.t+ih-(l-L0)/(L1-L0)*ih; }
+
+  var svg=el('svg',{viewBox:'0 0 '+W+' '+H,width:W,height:H,role:'img','aria-labelledby':'c2t c2d'},host);
+  el('desc',{id:'c2d'},svg).textContent='Line chart of relative risk, on a log scale, against how extreme the record was. For your settings the relative risk is about '+fmtRR(r.rr)+' times.';
+  var defs=el('defs',{},svg), cp=el('clipPath',{id:'clip2'},defs);
+  el('rect',{x:m.l,y:m.t-2,width:iw,height:ih+4},cp);
+
+  for(var l=L0;l<=L1;l++){
+    var val=Math.pow(10,l);
+    el('line',{x1:m.l,x2:W-m.r,y1:Y(val),y2:Y(val),stroke:'var(--grid)','stroke-width':1},svg);
+    txt(svg,m.l-8,Y(val)+4,(val<1?String(val):comma(val))+'×','ax','end');
+  }
+  var xs2=iw<420?2:1;
+  for(var xv=xa;xv<=xb;xv+=xs2) txt(svg,X(xv),H-m.b+18,'+'+xv,'ax','middle');
+  el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,stroke:'var(--ink3)','stroke-width':1},svg);
+  fitText(svg,m.l+iw/2,H-8,['Record height (°C above the typical hottest day in 1850–1900)','Record height (°C above 1850–1900 typical)','Record height (°C vs. 1850–1900)'],'axt','middle',iw+m.l-4);
+  var yt=fitText(svg,0,0,['Relative risk (× more likely, log scale)','Relative risk (×, log scale)'],'axt','middle',ih);
+  yt.setAttribute('transform','translate(13,'+(m.t+ih/2)+') rotate(-90)');
+
+  // "no change" reference at 1x
+  if(lmin<0){ el('line',{x1:m.l,x2:W-m.r,y1:Y(1),y2:Y(1),stroke:'var(--ink3)','stroke-width':1},svg); txt(svg,W-m.r-4,Y(1)-5,'no change (1×)','ax','end'); }
+
+  var plot=el('g',{'clip-path':'url(#clip2)'},svg);
+  var d='';
+  pts.forEach(function(p,i){ d+=(i?'L':'M')+X(p.e).toFixed(1)+' '+YR(p.hi).toFixed(1)+' '; });
+  for(var i=pts.length-1;i>=0;i--){ d+='L'+X(pts[i].e).toFixed(1)+' '+YR(pts[i].lo).toFixed(1)+' '; }
+  el('path',{d:d+'Z',fill:'var(--now)','fill-opacity':0.22,stroke:'none'},plot);
+  var dl='';
+  pts.forEach(function(p,i){ dl+=(i?'L':'M')+X(p.e).toFixed(1)+' '+YR(p.rr).toFixed(1)+' '; });
+  el('path',{d:dl,fill:'none',stroke:'var(--now)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},plot);
+
+  // your event
+  var mx=X(r.E), my=Y(r.rr);
+  el('line',{x1:mx,x2:mx,y1:my,y2:H-m.b,stroke:'var(--ink)','stroke-width':1},svg);
+  el('circle',{cx:mx,cy:my,r:5.5,fill:'var(--now)',stroke:'var(--page)','stroke-width':2},svg);
+  var tl='Your event: '+fmtRR(r.rr)+'×';
+  var fitsLeft=(mx-11-tl.length*7)>m.l;
+  txt(svg,fitsLeft?mx-11:mx+11,Math.max(m.t+12,my-9),tl,'lbl',fitsLeft?'end':'start');
+
+  // hover
+  var cross=el('line',{x1:0,x2:0,y1:m.t,y2:H-m.b,stroke:'var(--ink3)','stroke-width':1,visibility:'hidden'},svg);
+  var dot=el('circle',{r:4,fill:'var(--now)',stroke:'var(--page)','stroke-width':2,visibility:'hidden'},svg);
+  var ov=el('rect',{x:m.l,y:m.t,width:iw,height:ih,fill:'transparent','pointer-events':'all'},svg);
+  ov.addEventListener('pointermove',function(ev){
+    var b=svg.getBoundingClientRect();
+    var px=(ev.clientX-b.left)*(W/b.width), py=(ev.clientY-b.top)*(H/b.height);
+    var e=xa+(px-m.l)/iw*(xb-xa); e=Math.max(xa,Math.min(xb,Math.round(e*10)/10));
+    var mm=model(e,state.S,state.T,state.C/100);
+    var lo=model(e,state.S,state.T*0.75,state.C/100).rr, hi=model(e,state.S,state.T*1.25,state.C/100).rr;
+    cross.setAttribute('x1',X(e)); cross.setAttribute('x2',X(e)); cross.setAttribute('visibility','visible');
+    dot.setAttribute('cx',X(e)); dot.setAttribute('cy',Y(mm.rr)); dot.setAttribute('visibility','visible');
+    tipRows(tip,'Record '+signed(e,1)+' °C',[
+      {color:'var(--now)',label:'Relative risk',value:fmtRR(mm.rr)+'×'},
+      {color:'var(--ink3)',label:'Range (±25% warming)',value:fmtRR(Math.min(lo,hi))+'–'+fmtRR(Math.max(lo,hi))+'×'},
+      {color:'var(--then)',label:'Odds then: 1 in',value:oneIn(mm.p0)}
+    ]);
+    placeTip(tip,host,X(e),py);
+  });
+  ov.addEventListener('pointerleave',function(){ cross.setAttribute('visibility','hidden'); dot.setAttribute('visibility','hidden'); tip.style.display='none'; });
+}
+
+/* ---------- legends ---------- */
+function updateLegends(r){
+  var l1=$('leg1');
+  l1.textContent='';
+  [{c:'var(--then)',t:'1850–1900 climate: record or hotter in 1 in '+oneIn(r.p0)+' years ('+fmtPct(r.p0)+'% a year)'},
+   {c:'var(--now)',t:'Today’s climate: 1 in '+oneIn(r.p1)+' years ('+fmtPct(r.p1)+'% a year)'}].forEach(function(o){
+    var li=document.createElement('li'), k=document.createElement('span'); k.className='key'; k.style.borderTopColor=o.c;
+    li.appendChild(k); var s=document.createElement('span'); s.textContent=o.t; li.appendChild(s); l1.appendChild(li);
+  });
+  var l2=$('leg2'); l2.textContent='';
+  var a=document.createElement('li'), k1=document.createElement('span'); k1.className='key'; k1.style.borderTopColor='var(--now)';
+  a.appendChild(k1); var s1=document.createElement('span'); s1.textContent='Relative risk at your warming setting'; a.appendChild(s1); l2.appendChild(a);
+  var b=document.createElement('li'), k2=document.createElement('span'); k2.className='band';
+  b.appendChild(k2); var s2=document.createElement('span'); s2.textContent='If warming were 25% smaller or larger'; b.appendChild(s2); l2.appendChild(b);
+}
+
+/* ---------- main update ---------- */
+function update(){
+  readState();
+  var r=cur();
+  updateText(r);
+  updateLegends(r);
+  updateTable(r);
+  drawDist(r);
+  drawRR(r);
+}
+window.__attr={model:model,state:state,update:update};   // handy for testing in the console
+
+update();
+if('ResizeObserver' in window){
+  var lastW=0, ro=new ResizeObserver(function(){ var w=$('chart1').clientWidth; if(w!==lastW){ lastW=w; var r=cur(); drawDist(r); drawRR(r); } });
+  ro.observe($('chart1'));
+}else{
+  window.addEventListener('resize',function(){ var r=cur(); drawDist(r); drawRR(r); });
+}
+})();
+</script>
+</body>
+</html>
